@@ -88,8 +88,32 @@
         {{- end -}}
 
         {{- /* Content */ -}}
+        {{- $pwd := $params.password | default "" -}}
+        {{- if ne $pwd "" -}}
+        <form class="key-form" action="" method="get">
+            <input type="text" name="key">
+            <button>确认</button>
+        </form>
+        {{- end -}}
         <div class="content" id="content">
+            {{- if ne $pwd "" -}}
+            {{- $code := $pwd | base64Encode -}}
+            {{- replace $code "=" "" -}}
+
+            {{- $c := dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML | base64Encode -}}
+            {{- $rand := shuffle (seq 2 30) -}}
+            {{- $idx := 0 -}}
+            {{ range $num := first 1 $rand }}
+            {{- $idx = $num -}}
+            {{end}}
+            {{- substr $c 0 $idx -}}
+            {{- $code -}}
+            {{- substr $c $idx -}}
+            {{- end -}}
+
+            {{- if eq $pwd "" -}}
             {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            {{- end -}}
         </div>
 
         {{- /* Footer */ -}}

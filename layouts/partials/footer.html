@@ -53,6 +53,84 @@
         <span id="busuanzi_container_site_uv">
             本站访客数<span id="busuanzi_value_site_uv"></span>人次
         </span>
+        <script src="//cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.js"></script>
         <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.0.0/crypto-js.js"></script>
+        <script>
+            window.onload = () => {
+                try {
+                    const def = {
+                        keyForm: $('.key-form'),
+                        cur: location.href.split('?')[0],
+                        setC: (key) => {
+                            if (!key) {
+                                return false;
+                            }
+
+                            localStorage.setItem(def.cur, JSON.stringify({
+                                key: key,
+                                expires: parseInt(new Date().getTime() / 1000)
+                            }));
+                        },
+                        getC: (exp) => {
+                            if (parseInt(exp) < 1) {
+                                exp = 3600;
+                            }
+                            const c = localStorage.getItem(def.cur);
+                            if (!c) {
+                                return false;
+                            }
+                            const {key, expires} = JSON.parse(c);
+                            if (parseInt(new Date().getTime() / 1000) - expires >= exp) {
+                                localStorage.removeItem(def.cur);
+                                return false;
+                            }
+
+                            return key;
+                        },
+                        resetInit: () => {
+                            const inp = def.keyForm.find('input').val() || def.getC();
+                            let key = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(inp)).replace(/=/g, "");
+                            let mdContent = $('#content');
+                            const mdText = mdContent.text();
+                            mdContent.html(CryptoJS.enc.Base64.parse(mdText.replace(new RegExp(key, 'g'), '')).toString(CryptoJS.enc.Utf8))
+
+                            $('.key-form').remove();
+                            def.setC(inp);
+
+                            let ThemeCls = new Theme()
+                            ThemeCls.initSVGIcon();
+                            ThemeCls.initTwemoji();
+                            ThemeCls.initMenuMobile();
+                            ThemeCls.initSwitchTheme();
+                            ThemeCls.initSearch();
+                            ThemeCls.initDetails();
+                            ThemeCls.initLightGallery();
+                            ThemeCls.initHighlight();
+                            ThemeCls.initTable();
+                            ThemeCls.initHeaderLink();
+                            ThemeCls.initSmoothScroll();
+                            ThemeCls.initMath();
+                            ThemeCls.initMermaid();
+                            ThemeCls.initEcharts();
+                            ThemeCls.initTypeit();
+                            ThemeCls.initMapbox();
+                            ThemeCls.initCookieconsent();
+
+                            ThemeCls.initToc();
+                        }
+                    };
+                    if (def.getC()) {
+                        def.resetInit();
+                    }
+                    def.keyForm.on('click', 'button', () => {
+                        def.resetInit();
+                    })
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        </script>
     </footer>
 {{- end -}}

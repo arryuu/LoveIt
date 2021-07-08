@@ -51,10 +51,13 @@
 
     {{- /* Summary content */ -}}
     <div class="content">
-        {{- with .Summary -}}
-            {{- dict "Content" . "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
-        {{- else -}}
-            {{- .Description | safeHTML -}}
+        {{- $pwd := $params.password | default "" -}}
+        {{- if eq $pwd "" -}}
+            {{- with .Summary -}}
+                {{- dict "Content" . "Ruby" $params.ruby "Fraction" $params.fraction "Fontawesome" $params.fontawesome | partial "function/content.html" | safeHTML -}}
+            {{- else -}}
+                {{- .Description | safeHTML -}}
+            {{- end -}}
         {{- end -}}
     </div>
 
